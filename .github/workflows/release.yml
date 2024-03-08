@@ -43,15 +43,15 @@ jobs:
         run: cargo install --version 0.2.5 cross
       - name: Run tests
         if: matrix.cross
-        run: cross test --release --target ${{ matrix.target }} --verbose --no-default-features --features client
+        run: cross test --minimal --target ${{ matrix.target }} --verbose --no-default-features --features client
       - name: Build release
         if: matrix.cross
-        run: cross build --release --target ${{ matrix.target }} --features client --no-default-features
+        run: cross build --minimal --target ${{ matrix.target }} --features client --no-default-features
       # - name: Build release with Cargo
       #   if: matrix.cross
       #   run: cargo build --target mipsel-unknown-linux-musl --profile minimal --no-default-features --features client
       - name: Run Strip
-        run: strip ${{ matrix.exe }}/rathole
+        run: strip target/${{ matrix.target }}/release/${{ matrix.exe }}
       - name: Run UPX
         continue-on-error: true
         uses: crazy-max/ghaction-upx@v1
