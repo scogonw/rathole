@@ -47,16 +47,18 @@ jobs:
       - name: Build release
         if: matrix.cross
         run: cross build --release --target ${{ matrix.target }} --features client --no-default-features
-      - name: Build release with Cargo
-        if: matrix.cross
-        run: cargo build --target mipsel-unknown-linux-musl --profile minimal --no-default-features --features client
-      # - name: Run UPX
-      #   continue-on-error: true
-      #   uses: crazy-max/ghaction-upx@v1
-      #   with:
-      #     version: v4.0.2
-      #     files: target/${{ matrix.target }}/release/rathole-${{ matrix.target }}.zip
-      #     args: -q --best --lzma
+      # - name: Build release with Cargo
+      #   if: matrix.cross
+      #   run: cargo build --target mipsel-unknown-linux-musl --profile minimal --no-default-features --features client
+      - name: Run Strip
+        run: strip ${{ matrix.exe }}
+      - name: Run UPX
+        continue-on-error: true
+        uses: crazy-max/ghaction-upx@v1
+        with:
+          version: v4.0.2
+          files: target/${{ matrix.target }}/release/${{ matrix.exe }}
+          args: -q --best --lzma rathole
 
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.1
