@@ -51,14 +51,14 @@ jobs:
       #   if: matrix.cross
       #   run: cargo build --target mipsel-unknown-linux-musl --profile minimal --no-default-features --features client
       - name: Run Strip
-        run: strip ${{ matrix.exe }}
+        run: strip ${{ matrix.exe }}/rathole
       - name: Run UPX
         continue-on-error: true
         uses: crazy-max/ghaction-upx@v1
         with:
           version: v4.0.2
           files: target/${{ matrix.target }}/release/${{ matrix.exe }}
-          args: -q --best --lzma rathole
+          args: -q --best --lzma ${{ matrix.exe }}/rathole
 
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.1
