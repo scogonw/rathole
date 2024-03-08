@@ -24,6 +24,8 @@ jobs:
             target: mipsel-unknown-linux-musl
             exe: rathole
             cross: true
+            args: --best --lzma
+            strip: true
             
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +61,13 @@ jobs:
       #     version: v4.0.2
       #     files: target/${{ matrix.target }}/release/${{ matrix.exe }}
       #     args: -q --best --lzma ${{ matrix.exe }}/rathole
-
+      - name: Compress binaries
+        uses: svenstaro/upx-action@v2
+        with:
+          files: |
+              target/${{ matrix.target }}/release/${{ matrix.exe }}
+          args: ${{ matrix.args }}
+          strip: ${{ matrix.strip }}
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.1
         with:
