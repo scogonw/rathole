@@ -25,6 +25,7 @@ jobs:
             exe: rathole
             cross: true
             args: --best --lzma
+            strip: false
             
     steps:
       - uses: actions/checkout@v4
@@ -66,6 +67,7 @@ jobs:
           files: |
               target/${{ matrix.target }}/release/${{ matrix.exe }}
           args: ${{ matrix.args }}
+          strip: ${{ matrix.strip }}
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.1
         with:
