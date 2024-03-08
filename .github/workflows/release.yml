@@ -46,8 +46,7 @@ jobs:
         run: cross test --release --target ${{ matrix.target }} --verbose --no-default-features --features client
       - name: Build release
         if: matrix.cross
-        run: cargo build --profile minimal --target ${{ matrix.target }} --no-default-features --features client
-        # run: cross build --release --target ${{ matrix.target }} --features client --no-default-features
+        run: cross build --release --target ${{ matrix.target }} --features client --no-default-features
 
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.1
