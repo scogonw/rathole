@@ -70,7 +70,7 @@ panic = "abort"
 
 [profile.release]
 panic = "abort"
-opt-level = "z"
+opt-level = "s"
 lto = true
 codegen-units = 1
 strip = true
@@ -80,7 +80,7 @@ debug = 1
 
 [profile.minimal]
 inherits = "release"
-opt-level = "z"
+opt-level = "s"
 lto = true
 strip = true
 codegen-units = 1
