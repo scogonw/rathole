@@ -43,24 +43,15 @@ jobs:
       - name: Install cross
         if: matrix.cross
         run: cargo install --version 0.2.5 cross
+
       - name: Run tests
         if: matrix.cross
         run: cross test --release --target ${{ matrix.target }} --verbose --no-default-features --features client
+
       - name: Build release
         if: matrix.cross
         run: cross build --release --target ${{ matrix.target }} --features client --no-default-features
-      # - name: Build release with Cargo
-      #   if: matrix.cross
-      #   run: cargo build --target mipsel-unknown-linux-musl --profile minimal --no-default-features --features client
-      # - name: Run Strip
-      #   run: strip target/${{ matrix.target }}/release/${{ matrix.exe }}
-      # - name: Run UPX
-      #   continue-on-error: true
-      #   uses: crazy-max/ghaction-upx@v1
-      #   with:
-      #     version: v4.0.2
-      #     files: target/${{ matrix.target }}/release/${{ matrix.exe }}
-      #     args: -q --best --lzma ${{ matrix.exe }}/rathole
+
       - name: Compress binaries
         uses: svenstaro/upx-action@v2
         with:
@@ -68,17 +59,31 @@ jobs:
               target/${{ matrix.target }}/release/${{ matrix.exe }}
           args: ${{ matrix.args }}
           strip: ${{ matrix.strip }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  
+      - name: Upload S3 Bucket
+        run: |
+          aws s3 rm s3://${{ vars.AWS_S3_BUCKET }}/${{ matrix.exe }}/target/${{ matrix.target }}/release  --recursive
+          aws s3 cp ./target/${{ matrix.target }}/release/${{ matrix.exe }} s3://${{ vars.AWS_S3_BUCKET }}/${{ matrix.exe }}/target/${{ matrix.target }}/release/${{ matrix.exe }}
+
       - name: Zip Release
-        uses: TheDoctor0/zip-release@0.6.1
+        uses: TheDoctor0/zip-release@0.7.5
         with:
           type: zip
           filename: rathole-${{ matrix.target }}.zip
           directory: target/${{ matrix.target }}/release/
           path: ${{ matrix.exe }}
+
       - name: Publish
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: target/${{ matrix.target }}/release/rathole-${{ matrix.target }}.zip
           generate_release_notes: true
-          draft: true
+          draft: false
